@@ -1,38 +1,37 @@
 package com.khangai.tarkhaev.name;
 
-public class Name {
+public class Name implements PrintableName {
 
-    private String name;
+    private String firstName;
 
     public Name(String... nameArgs) {
-        name = nameArgs[0];
+        firstName = nameArgs[0];
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
     public String getName() {
-        return name;
+        return firstName;
     }
 
     public void print() {
-
+        System.out.print("Ура! мы нашли имя: " + firstName);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        System.out.println(getClass());
         Name name1 = (Name) o;
 
-        return name.equals(name1.name);
+        return firstName.equals(name1.firstName);
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return firstName.hashCode();
     }
 }
 

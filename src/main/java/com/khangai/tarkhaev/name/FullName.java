@@ -14,6 +14,12 @@ public class FullName extends BinomialName {
     }
 
     @Override
+    public void print() {
+        super.print();
+        System.out.print(", отчество: " + patronymic);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (!super.equals(o)) return false;
         FullName fullName = (FullName) o;

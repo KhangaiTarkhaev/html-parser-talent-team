@@ -3,26 +3,17 @@ package com.khangai.tarkhaev.startup;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Objects;
-import java.util.Optional;
+
 
 public class App {
 
     @Parameter
-    String html;
+    private String html;
 
     @Parameter(names = {"--path", "-p"}, converter = HtmlFileConverter.class)
-    File file;
-
-    @Parameter(names = {"--url", "-u"})
-    String url;
+    private File file;
 
     public static void main(String[] args) {
         App app = new App();
@@ -33,32 +24,17 @@ public class App {
         app.run();
     }
 
-    public void run() {
-        Document document = null;
-        if (Objects.nonNull(html)) {
-            document = Jsoup.parse(html);
-        } else if (Objects.nonNull(file)) {
-            try {
-                document = Jsoup.parse(file, "UTF-8");
-            } catch (IOException ioException) {
-                System.out.println("Cannot read file : " + ioException.getMessage());
-            }
-        } else if (Objects.nonNull(url)){
-            document = Jsoup.parse(url);
-        } else {
-            System.out.println("Illegal arguments. Valid args : --path or -p <absolute path to html> \\n " +
-                    "--url or -u <url to parse>\\n"
-                     + "pass html string as argument");
+    private void run() {
+        HTMLParser htmlParser = null;
+        if (html != null) {
+            htmlParser = new HTMLParser(html);
+        } else if (file != null) {
+            htmlParser = new HTMLParser(file);
         }
-        Optional<Element> element = document.getElementsByTag("p").stream().
-                filter(elem -> elem.hasClass("full_name")).findAny();
-        String fullName = null;
-        if (element.isPresent()) {
-            fullName = element.get().text();
-            String[] fullNameArray = fullName.split("\\s+");
-
+        if (htmlParser != null) {
+            htmlParser.parse();
         } else {
-            System.out.println("");
+            System.out.println("Illegal arguments");
         }
     }
 }

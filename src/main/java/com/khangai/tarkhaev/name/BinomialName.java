@@ -13,6 +13,10 @@ public class BinomialName extends Name {
         return surname;
     }
 
+    @Override
+    public void print() {
+        System.out.println("Ура! мы нашли фамилию: " + surname + ", имя: " + super.getName());
+    }
 
     @Override
     public boolean equals(Object o) {
