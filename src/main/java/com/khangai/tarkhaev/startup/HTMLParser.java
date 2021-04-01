@@ -1,64 +1,79 @@
 package com.khangai.tarkhaev.startup;
 
 
-import com.khangai.tarkhaev.name.PrintableName;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.parser.ParseError;
-import org.jsoup.parser.ParseErrorList;
-import org.jsoup.parser.Parser;
+import com.khangai.tarkhaev.name.BinomialName;
+import com.khangai.tarkhaev.name.FullName;
+import com.khangai.tarkhaev.name.Name;
+import com.khangai.tarkhaev.name.PrintStrategy;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
-
-
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.*;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Optional;
+import java.io.StringReader;
 
 public class HTMLParser {
 
-    private final Parser parser = Parser.htmlParser().setTrackErrors(1);
+    //Using DOM - HTML Parsers auto clean dirty html code: cannot detect invalid html code.
+    DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 
     private Document document;
 
     HTMLParser(String html) {
-        document = Jsoup.parse(html, "", parser);
+        try {
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            document = documentBuilder.parse(new InputSource(new StringReader(html)));
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            System.out.println("Кривой HTML");
+            System.out.println(e.getMessage());
+        }
     }
 
     HTMLParser(File html) {
         try {
-            document = Jsoup.parse(new FileInputStream(html), "UTF-8", "", parser);
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            document = documentBuilder.parse(html);
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            e.printStackTrace();
         }
+
     }
 
     public void parse() {
-        ParseErrorList errors = parser.getErrors();
-        if (errors.size() > 0) {
-            System.out.println("Кривой HTML");
-            for (ParseError parseError : errors) {
-                System.out.println(parseError.getErrorMessage());
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        XPathExpression xPathExpression = null;
+        try {
+            xPathExpression = xPath.compile("//p[@class='full_name']");
+            Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
+            if (node == null) {
+                System.out.println("Не найдено тега <p> с классом \"full_name\"");
+                return;
             }
-            return;
-        }
-        Optional<Element> elementOptional = document.getElementsByTag("p").stream().
-                filter(elem -> elem.hasClass("full_name")).findAny();
-        if (elementOptional.isPresent()) {
-            Element element = elementOptional.get();
-            if (element.hasText()) {
-                String[] fullNameArray = element.text().split("\\s+");
-                if (fullNameArray.length <= 3) {
-                    PrintableName.getInstance(fullNameArray).print();
-                } else {
-                    System.out.println("Упс! Кажется, что-то слишком сложное :(");
-                }
-            } else {
+            System.out.println(node.getFirstChild().getNodeType() == Node.TEXT_NODE);
+            String text = node.getFirstChild().getNodeValue();
+            if (text == null) {
                 System.out.println("Тег пуст");
+                return;
             }
-        } else {
-            System.out.println("Не найдено тега <p> с классом \"full_name\"");
+            String[] fullNameArray = text.split("\\s+");
+            int fullNameSize = fullNameArray.length;
+            if (!(fullNameSize <= 3)) {
+                System.out.println("Упс! Кажется, что-то слишком сложное :(");
+                return;
+            }
+            PrintStrategy printStrategy = fullNameSize == 1 ? new Name(fullNameArray[0]) :
+                    fullNameSize == 2 ? new BinomialName(fullNameArray) : new FullName(fullNameArray);
+            printStrategy.print();
+        } catch (XPathExpressionException e) {
+            e.printStackTrace();
         }
     }
 }
+
+

@@ -22,9 +22,11 @@ public class App {
                 build().
                 parse(args);
         app.run();
+
     }
 
     private void run() {
+        System.out.println(html);
         HTMLParser htmlParser = null;
         if (html != null) {
             htmlParser = new HTMLParser(html);
