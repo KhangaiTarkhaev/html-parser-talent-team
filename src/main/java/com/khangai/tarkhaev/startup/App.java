@@ -10,7 +10,7 @@ import java.io.File;
 public class App {
 
     @Parameter
-    private String html;
+    private String htmlString;
 
     @Parameter(names = {"--path", "-p"}, converter = HtmlFileConverter.class)
     private File file;
@@ -26,12 +26,11 @@ public class App {
     }
 
     private void run() {
-        System.out.println(html);
         HTMLParser htmlParser = null;
-        if (html != null) {
-            htmlParser = new HTMLParser(html);
+        if (htmlString != null) {
+            htmlParser = new HTMLParser().setDocument(htmlString);
         } else if (file != null) {
-            htmlParser = new HTMLParser(file);
+            htmlParser = new HTMLParser().setDocument(file);
         }
         if (htmlParser != null) {
             htmlParser.parse();
