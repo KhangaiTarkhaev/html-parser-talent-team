@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="html-parser:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/html_parser_jar</output-path>
+    <root id="archive" name="html-parser.jar">
+      <element id="module-output" name="html-parser" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/beust/jcommander/1.78/jcommander-1.78.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
