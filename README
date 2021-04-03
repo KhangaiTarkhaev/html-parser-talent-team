@@ -3,3 +3,6 @@ java -jar html-parser.jar <html>
 Не забудьте добавить двойные скобки, для распознавания аргумента как одну строку "<html><body><div><p class="full_name">Василий</p></div></body></html>"
 Запуск используя абсолютный путь до файла:
 java -jar html-parser.jar <абсолютный путь>
+
+Репозиторий:
+https://github.com/KhangaiTarkhaev/html-parser-talent-team
